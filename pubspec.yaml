@@ -30,11 +30,34 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  flutter_blue: ^0.8.0
+  # flutter_blue: ^0.8.0
+  dropdown_button2: 
+  lottie: ^1.4.2
+  shared_preferences: ^0.5.5
+  http: ^0.13.5
+  flutter_launcher_icons: ^0.11.0
+  flutter_native_splash: ^2.1.6
+  bluetooth_thermal_printer: ^0.0.6
+  esc_pos_utils_plus: ^2.0.1+6
+  workmanager: ^0.4.1
+  cached_network_image: ^2.5.1
+  ticket_widget: ^0.0.1
+  davinci: ^2.0.6
+  path_provider: ^2.0.11
+  # cached_network_image:
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # flutter_launcher_icons:
+flutter_native_splash:
+  image: "assets/icons/icon.png"
+  color: "#ffffff"
+
+flutter_icons:
+  android: true
+  image_path: "assets/icons/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -72,6 +95,10 @@ flutter:
      - family: Anton
        fonts:
          - asset: assets/fonts/Anton-Regular.ttf
+  assets: 
+    - assets/main/
+    - assets/data/
+    - assets/reciepts/
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

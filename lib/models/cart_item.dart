@@ -4,7 +4,7 @@ class CartItem {
   final String? id;
   final String? title;
   final double? price;
-  final int? quantity;
+  final double? quantity;
 
   const CartItem({
     @required this.id,

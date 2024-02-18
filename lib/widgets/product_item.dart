@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +20,18 @@ class ProductItem extends StatelessWidget {
             Navigator.of(context).pushNamed(ProductDetailScreen.routeName,
                 arguments: product.id);
           },
-          child: Image.network(product.imageUrl!, fit: BoxFit.cover),
+          child: CachedNetworkImage(
+            fit: BoxFit.cover,
+            imageUrl: product.imageUrl,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                Center(
+                    child: SizedBox(
+                        height: 50,
+                        width: 50,
+                        child: CircularProgressIndicator(
+                            value: downloadProgress.progress))),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          ),
         ),
         footer: GridTileBar(
           backgroundColor: Colors.black87,

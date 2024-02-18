@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/screens/login_page/controllers/auth_controller.dart';
 
 import '../widgets/products_grid.dart';
 import '../widgets/badge.dart';
@@ -18,6 +21,7 @@ class ProductsOverViewScreen extends StatefulWidget {
 }
 
 class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
+  
   bool _showFavoritesOnly = false;
   @override
   Widget build(BuildContext context) {

@@ -1,0 +1,19 @@
+{
+  "number": 1,
+  "date": "2024-01-27",
+  "dueDate": "2024-01-30",
+  "userName": "millimeter",
+  "userLocation": "delectus aut autem",
+  "userEmail": "chirume37@gmail.com",
+  "client": {
+    "name": "Blessing Chirume",
+    "address": "Solomio Park",
+    "email": "chirume37@gmail.com"
+  },
+  "items": [{
+    "name": "Lp gas",
+    "rate": 1.20,
+    "hours": 5
+  }]
+
+}

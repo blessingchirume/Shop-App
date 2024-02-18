@@ -1,40 +1,32 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shop_app/controllers/controllers.dart';
+import 'package:shop_app/screens/login_page/controllers/auth_controller.dart';
 
 import 'product.dart';
 
 class Products with ChangeNotifier {
-  List<Product> _items = [
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl: 'http://s6.uplod.ir/i/01025/89ykrz4z7bm4.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl: 'http://s6.uplod.ir/i/01025/x3rl8b61m97q.jpg',
-    ),
-    Product(
-      id: 'p4',
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
-  ];
+  // List<Product> _items = [
+  //   Product(
+  //     id: 'p2',
+  //     title: 'Commecial LP Gas',
+  //     description: 'Commercial LP Gas for industrial use',
+  //     price: 59.99,
+  //     imageUrl:
+  //         'https://scontent.fhre2-2.fna.fbcdn.net/v/t39.30808-6/307273770_1539631713168461_6747591523823271969_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=dd5e9f&_nc_ohc=ZA3snlQFR0cAX-Aleez&_nc_ht=scontent.fhre2-2.fna&oh=00_AfB3PC2QlNMSC4tKwpsj0hnitVmmz-VTDZNQV9wzmK-P7A&oe=65C22662',
+  //   ),
+  //   Product(
+  //     id: 'p4',
+  //     title: 'Residential LP Gas',
+  //     description: 'Commercial LP Gas for industrial use',
+  //     price: 49.99,
+  //     imageUrl:
+  //         'https://scontent.fhre2-2.fna.fbcdn.net/v/t39.30808-6/307273770_1539631713168461_6747591523823271969_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=dd5e9f&_nc_ohc=ZA3snlQFR0cAX-Aleez&_nc_ht=scontent.fhre2-2.fna&oh=00_AfB3PC2QlNMSC4tKwpsj0hnitVmmz-VTDZNQV9wzmK-P7A&oe=65C22662',
+  //   ),
+  // ];
+
+  List<Product> _items = [];
 
   // bool _showFavoritesOnly = false;
 
@@ -48,7 +40,6 @@ class Products with ChangeNotifier {
   List<Product> get favoriteItems {
     return _items.where((thisone) => thisone.isFavorite).toList();
   }
-
 
   // void showFavoritesOnly(){
   //   _showFavoritesOnly = true;
@@ -76,19 +67,48 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateProduct(String id , Product newProduct){
+  void updateProduct(String id, Product newProduct) {
     final prodIndex = _items.indexWhere((thisone) => thisone.id == id);
-    if(prodIndex >= 0){
+    if (prodIndex >= 0) {
       _items[prodIndex] = newProduct;
       notifyListeners();
-    }else{
+    } else {
       print('not have id..... products provider model');
     }
   }
 
-  void deleteProduct(String id){
+  void deleteProduct(String id) {
     _items.removeWhere((thisone) => thisone.id == id);
     notifyListeners();
   }
 
+  Future<void> getAsync() async {
+    var data = await BaseController().getBranchProducts();
+    if (_items.isEmpty) {
+      for (var element in data['success']) {
+        _items.add(new Product(
+            id: element['item_code'],
+            price: double.parse(element['price'].toString()),
+            description: element['item_description'],
+            title: element['item_description'],
+            imageUrl: element['image_url']));
+      }
+      notifyListeners();
+    }
+  }
+
+  Future<void> getBranchProductsFromSharedPreferences() async {
+    var data = await BaseController().getBranchProductsFromSharedPreferences();
+    if (_items.isEmpty) {
+      for (var element in data) {
+        _items.add(new Product(
+            id: element['item_code'],
+            price: double.parse(element['price'].toString()),
+            description: element['item_description'],
+            title: element['item_description'],
+            imageUrl: element['image_url']));
+      }
+      notifyListeners();
+    }
+  }
 }

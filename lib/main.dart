@@ -1,22 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:shop_app/screens/print_screen.dart';
+import 'package:shop_app/constants/routing_constants.dart';
+import 'package:shop_app/providers/draft_order.dart';
+import 'package:shop_app/providers/transfer.dart';
+import 'package:shop_app/providers/user.dart';
+import 'package:shop_app/routes.dart';
+import 'package:shop_app/services/background_transaction_service.dart';
+import 'package:workmanager/workmanager.dart';
 
-import './screens/product_detail_screen.dart';
-import './screens/products_overview_screen.dart';
 import './providers/products.dart';
 import './providers/cart.dart';
 import './providers/orders.dart';
-import './screens/cart_screen.dart';
-import './screens/orders_screen.dart';
-import './screens/user_products_screen.dart';
-import './screens/edit_product_screen.dart';
 
-void main() => runApp(MyApp());
+String task = 're-initialize-failed-sales';
 
-class MyApp extends StatelessWidget {
+void callbackDispatcher() {
+  Workmanager().executeTask((taskName, inputData) {
+    BackgroundTransactionService().createTransaction();
+    print(taskName);
+    return Future.value(true);
+  });
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+  runApp(MyApp());
+}
+
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    await Workmanager().registerPeriodicTask(
+      DateTime.now().toString(),
+      task,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,24 +53,28 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => Products()),
         ChangeNotifierProvider(create: (context) => Cart()),
         ChangeNotifierProvider(create: (context) => Orders()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => TransferProvider()),
+        ChangeNotifierProvider(create: (context) => OfflineOrderProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
           fontFamily: 'Lato',
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green)
+              .copyWith(secondary: Colors.deepOrange),
         ),
-        initialRoute: '/print',
-        routes: {
-          '/': (context) => ProductsOverViewScreen(),
-          ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
-          CartScreen.routeName: (context) => CartScreen(),
-          OrdersScreen.routeName: (context) => OrdersScreen(),
-          UserProductsScreen.routeName: (context) => UserProductsScreen(),
-          EditProductScreen.routeName: (context) => EditProductScreen(),
-          FlutterBlueApp.routeName:(context) => FlutterBlueApp()
-        },
+        initialRoute: RoutingConstants.davinci,
+        onGenerateRoute: RouteGenerator.generateRoute,
+        // routes: {
+        //   '/': (context) => ProductsOverViewScreen(),
+        //   ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
+        //   CartScreen.routeName: (context) => CartScreen(),
+        //   OrdersScreen.routeName: (context) => OrdersScreen(),
+        //   UserProductsScreen.routeName: (context) => UserProductsScreen(),
+        //   EditProductScreen.routeName: (context) => EditProductScreen(),
+        //   LoginPageView.routeName:(context) => LoginPageView()
+        // },
       ),
     );
   }
