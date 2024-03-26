@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/constants/routing_constants.dart';
 import 'package:shop_app/controllers/controllers.dart';
+import 'package:shop_app/providers/currency.dart';
 import 'package:shop_app/providers/user.dart';
 import 'package:shop_app/screens/components/colors.dart';
 import 'package:shop_app/screens/components/size_config.dart';
@@ -114,15 +115,15 @@ class _LoginPageViewState extends State<LoginPageView> {
                   //   isLoading: isLoading,
                   //   onPressed: () async => authentication(context),
                   // ),
-                  // LoginButonColor(
-                  //   onPressed: () {
-                  //     authentication(context);
-                  //   },
-                  // ),
-
                   LoginButonColor(
-                      onPressed: () async => _generatePrintableInvoice()),
-                  TextSignUp()
+                    onPressed: () {
+                      authentication(context);
+                    },
+                  ),
+
+                  // LoginButonColor(
+                  //     onPressed: () async => _generatePrintableInvoice()),
+                  // TextSignUp()
                 ],
               ),
             ),
@@ -155,7 +156,9 @@ class _LoginPageViewState extends State<LoginPageView> {
         setState(() => isLoading = false);
       } else {
         var provider = Provider.of<UserProvider>(context, listen: false);
+        var currencyProvider = Provider.of<Currency>(context, listen: false);
         provider.getUserData();
+        currencyProvider.getCurrenciesAsync();
         ProcessNotificationService.stopLoading(context);
         setState(() => isLoading = false);
         Navigator.pushReplacementNamed(context, RoutingConstants.products);

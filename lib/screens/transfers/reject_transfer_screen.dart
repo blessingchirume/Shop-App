@@ -18,60 +18,60 @@ class TransferRejectionScreen extends StatelessWidget {
     var valueTextEditingController;
 
     var provider = Provider.of<TransferProvider>(context, listen: false);
-    return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: SizedBox(
-        height: SizeConfig.screenHeight!,
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                LottieWidget(),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      SizeConfig.screenWidth! / 20.55,
-                      SizeConfig.screenHeight! / 68.3,
-                      SizeConfig.screenWidth! / 20.55,
-                      SizeConfig.screenHeight! / 34.15),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        
-                        TextFieldInputWithCallBack(
-                          iconName: Icons.monetization_on_outlined,
-                          ltext: 'Rejection reason',
-                          text: 'Rejection reason',
-                          controller: valueTextEditingController,
-                        ),
-                      ],
+    return Scaffold(
+      body: Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: SizedBox(
+          height: SizeConfig.screenHeight!,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  LottieWidget(),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                        SizeConfig.screenWidth! / 20.55,
+                        SizeConfig.screenHeight! / 68.3,
+                        SizeConfig.screenWidth! / 20.55,
+                        SizeConfig.screenHeight! / 34.15),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          
+                          TextFieldInputWithCallBack(
+                            iconName: Icons.monetization_on_outlined,
+                            ltext: 'Rejection reason',
+                            text: 'Rejection reason',
+                            controller: valueTextEditingController,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-
-                // const Text('Modal BottomSheet'),
-                ElevatedButton(
-                    child: const Text('REJECT TRANSFER'),
-                    onPressed: () {
-                      ProcessNotificationService.startLoading(context);
-
-                      try {
-                        provider.rejectTransfer(ModalRoute.of(context)!
-                            .settings
-                            .arguments as TransferModel);
-                        Navigator.pop(context);
-                        ProcessNotificationService.stopLoading(context);
-                      } catch (e) {
-                        ProcessNotificationService.stopLoading(context);
-                        ProcessNotificationService.error(context, "Oops: ${e}");
-                        Navigator.pop(context);
-                      }
-                    }),
-              ],
+    
+                  // const Text('Modal BottomSheet'),
+                  ElevatedButton(
+                      child: const Text('REJECT TRANSFER'),
+                      onPressed: () {
+                        ProcessNotificationService.startLoading(context);
+    
+                        try {
+                          provider.rejectTransfer(this.transfer);
+                          // Navigator.pop(context);
+                          ProcessNotificationService.stopLoading(context);
+                        } catch (e) {
+                          ProcessNotificationService.stopLoading(context);
+                          ProcessNotificationService.error(context, "Oops: ${e}");
+                          Navigator.pop(context);
+                        }
+                      }),
+                ],
+              ),
             ),
           ),
         ),

@@ -54,12 +54,12 @@ class Products with ChangeNotifier {
     return _items.firstWhere((thisone) => thisone.id == id);
   }
 
-  void addProduct(Product product) {
+  void addProduct(Product product, double rate) {
     final Product newProduct = Product(
       id: DateTime.now().toString(),
       title: product.title,
       description: product.description,
-      price: product.price,
+      price: product.price! * rate,
       imageUrl: product.imageUrl,
     );
 
@@ -104,6 +104,24 @@ class Products with ChangeNotifier {
         _items.add(new Product(
             id: element['item_code'],
             price: double.parse(element['price'].toString()),
+            description: element['item_description'],
+            title: element['item_description'],
+            imageUrl: element['image_url']));
+      }
+      notifyListeners();
+    }
+  }
+
+  Future<void> refreshProductsFromSharedPreferencesWitheRate(
+      double rate) async {
+    var data = await BaseController().getBranchProductsFromSharedPreferences();
+    _items.clear();
+    if (_items.isEmpty) {
+      for (var element in data) {
+        _items.add(new Product(
+            id: element['item_code'],
+            price: double.parse(
+                (rate * double.parse(element['price'].toString())).toString()),
             description: element['item_description'],
             title: element['item_description'],
             imageUrl: element['image_url']));

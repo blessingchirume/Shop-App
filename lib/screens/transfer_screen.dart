@@ -18,7 +18,7 @@ class TransferScreen extends StatelessWidget {
     final provider = Provider.of<TransferProvider>(context, listen: false);
     return Scaffold(
       drawer: AppDrawer(),
-      appBar: AppBar(title: Text('Pendings inventory transfers')),
+      appBar: AppBar(title: Text('Pending inventory transfers')),
       body: FutureBuilder(
         future: provider.getPendingTransfers(),
         builder: (context, snapshot) {

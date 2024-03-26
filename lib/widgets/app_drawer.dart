@@ -45,6 +45,16 @@ class AppDrawer extends StatelessWidget {
                   .pushReplacementNamed(RoutingConstants.draftSales);
             },
           ),
+
+           Divider(),
+          ListTile(
+            leading: Icon(Icons.edit_attributes_outlined),
+            title: Text('Cancellation requests'),
+            onTap: () {
+              Navigator.of(context)
+                  .pushReplacementNamed(RoutingConstants.cancellationRequests);
+            },
+          ),
           Divider(),
           ListTile(
             leading: Icon(Icons.person_outline),

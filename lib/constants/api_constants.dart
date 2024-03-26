@@ -1,10 +1,10 @@
 class ApiConstants {
-  
   static const String acceptType = "application/json";
 
   static const String contentType = "application/json";
 
-  static const String baseUrl = "http://192.168.1.103:8000/api";
+  static const String baseUrl = "http://197.211.244.141:9097/api";
+  // static const String baseUrl = "http://192.168.151.53:8000/api";
 
   static String auth = baseUrl + '/login';
 
@@ -36,5 +36,10 @@ class ApiConstants {
 
   static String makePayment = baseUrl + "/make-payment";
 
-  static String sendCancellationRequest = baseUrl + "/send-cancellation-request";
+  static String sendCancellationRequest =
+      baseUrl + "/send-cancellation-request";
+        static String getCancellationRequest =
+      baseUrl + "/get-cancellation-request";
+    static String currencies = baseUrl + "/currencies";
+
 }

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:shop_app/providers/cart.dart';
 import 'package:ticket_widget/ticket_widget.dart';
 
+import 'login_page/models/api_user_model.dart';
 
 class MyTicketView extends StatelessWidget {
   const MyTicketView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.blueGrey,
       body: Center(
         child: TicketWidget(
@@ -15,7 +18,7 @@ class MyTicketView extends StatelessWidget {
           height: 500,
           isCornerRounded: true,
           padding: EdgeInsets.all(20),
-          child: TicketData(),
+          child: Placeholder()
         ),
       ),
     );
@@ -23,106 +26,182 @@ class MyTicketView extends StatelessWidget {
 }
 
 class TicketData extends StatelessWidget {
+  final Cart cart;
+  final int invoiceNumber;
+  final double tenderedAmount;
+  final User? user;
   const TicketData({
     Key? key,
+    required this.cart,
+    required this.invoiceNumber,
+    required this.tenderedAmount,
+    required this.user,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              width: 120.0,
-              height: 25.0,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30.0),
-                border: Border.all(width: 1.0, color: Colors.green),
-              ),
-              child: const Center(
-                child: Text(
-                  'Business Class',
-                  style: TextStyle(color: Colors.green),
-                ),
-              ),
-            ),
-             Row(
-              children: [
-                Text(
-                  'LHR',
-                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 8.0),
-                  child: Icon(
-                    Icons.flight_takeoff,
-                    color: Colors.pink,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 8.0),
-                  child: Text(
-                    'ISL',
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                  ),
-                )
-              ],
-            )
-          ],
-        ),
-        const Padding(
-          padding: EdgeInsets.only(top: 20.0),
-          child: Text(
-            'Flight Ticket',
-            style: TextStyle(color: Colors.black, fontSize: 20.0, fontWeight: FontWeight.bold),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 25.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    // var provider = Provider.of<UserProvider>(context, listen: false);
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ticketDetailsWidget('Passengers', 'Hafiz M Mujahid', 'Date', '28-08-2022'),
-              Padding(
-                padding: const EdgeInsets.only(top: 12.0, right: 52.0),
-                child: ticketDetailsWidget('Flight', '76836A45', 'Gate', '66B'),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 12.0, right: 53.0),
-                child: ticketDetailsWidget('Class', 'Business', 'Seat', '21B'),
+              Container(
+                width: 120.0,
+                height: 25.0,
               ),
             ],
           ),
-        ),
-        // Padding(
-        //   padding: const EdgeInsets.only(top: 80.0, left: 30.0, right: 30.0),
-        //   child: Container(
-        //     width: 250.0,
-        //     height: 60.0,
-        //     decoration:
-        //         const BoxDecoration(image: DecorationImage(image: AssetImage('assets/barcode.png'), fit: BoxFit.cover)),
-        //   ),
-        // ),
-        const Padding(
-          padding: EdgeInsets.only(top: 10.0, left: 75.0, right: 75.0),
-          child: Text(
-            '0000 +9230 2884 5163',
-            style: TextStyle(
-              color: Colors.black,
+          Center(
+            child: const Padding(
+              padding: EdgeInsets.only(top: 20.0),
+              child: Text(
+                'Quality Gases',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
           ),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Invoice Number",
+                    style: const TextStyle(
+                        color: Colors.grey,
+                        letterSpacing: 1,
+                        fontWeight: FontWeight.w100),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "${this.invoiceNumber}",
+                      style: const TextStyle(
+                          color: Colors.grey,
+                          letterSpacing: 1,
+                          fontWeight: FontWeight.w100),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 25.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                ticketDetailsWidget(
+                    'Sales Personel', '${user!.name}', 'Date', '${DateFormat('yyyy-MM-dd kk:mm').format(DateTime.now())}'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 30.0,
+                  ),
+                  child: _buildItemRow('QTY item', 'price'),
+                ),
+                Column(
+                  children: cart.items.values
+                      .map((item) => Padding(
+                            padding: const EdgeInsets.only(
+                              top: 12.0,
+                            ),
+                            child: _buildItemRow(
+                                '${item.quantity}x ${item.title}',
+                                '${item.price}'),
+                          ))
+                      .toList(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 30.0),
+                  child: _buildItemRow('Sale Total', '${cart.totalAmount}'),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 30.0),
+                  child: _buildItemRow('Tendered Amount', 'Change'),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 12.0,
+                  ),
+                  child: _buildItemRow(
+                      '${tenderedAmount}',
+                      (tenderedAmount -
+                              (double.parse(cart.totalAmount.toString())))
+                          .toString()),
+                ),
+              ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 40.0, left: 75.0, right: 75.0),
+            child: Center(
+              child: Text(
+                'Thank you!',
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 30),
+          // const Text('         Developer: instagram.com/DholaSain')
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemRow(
+    String firstTitle,
+    String firstDesc,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0),
+              child: Text(
+                firstTitle,
+                style: const TextStyle(
+                    color: Colors.grey,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.w100),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 30),
-        const Text('         Developer: instagram.com/DholaSain')
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 20.0),
+              child: Text(
+                firstDesc,
+                style: const TextStyle(
+                    color: Colors.grey,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.w100),
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
 }
 
-Widget ticketDetailsWidget(String firstTitle, String firstDesc, String secondTitle, String secondDesc) {
+Widget ticketDetailsWidget(String firstTitle, String firstDesc,
+    String secondTitle, String secondDesc) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [

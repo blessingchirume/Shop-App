@@ -2,6 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/controllers/controllers.dart';
+import 'package:shop_app/models/currency_model.dart';
+import 'package:shop_app/providers/currency.dart';
+import 'package:shop_app/providers/products.dart';
 import 'package:shop_app/screens/login_page/controllers/auth_controller.dart';
 
 import '../widgets/products_grid.dart';
@@ -21,15 +25,36 @@ class ProductsOverViewScreen extends StatefulWidget {
 }
 
 class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
-  
   bool _showFavoritesOnly = false;
   @override
   Widget build(BuildContext context) {
+    var productProvider = Provider.of<Products>(context, listen: false);
     return Scaffold(
       drawer: AppDrawer(),
       appBar: AppBar(
         title: Text('My Shop'),
         actions: <Widget>[
+          Consumer<Currency>(
+            builder: (context, value, child) {
+              return PopupMenuButton(
+                icon: Icon(Icons.currency_exchange_outlined),
+                onSelected: (CurrencyModel selectedItem) async {
+                  // await value.selectCurrency(selectedItem);
+                  await productProvider
+                      .refreshProductsFromSharedPreferencesWitheRate(
+                          selectedItem.rate!);
+                },
+                itemBuilder: (context) => value.currencies
+                    .map(
+                      (e) => PopupMenuItem(
+                        child: Text(e.code!),
+                        value: e,
+                      ),
+                    )
+                    .toList(),
+              );
+            },
+          ),
           PopupMenuButton(
             icon: Icon(Icons.more_vert),
             onSelected: (selectedItems) {
@@ -41,7 +66,7 @@ class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
                 }
               });
             },
-            itemBuilder: (context) => <PopupMenuItem>[
+            itemBuilder: (context) => [
               PopupMenuItem(
                 child: Text('Only Favorites'),
                 value: FilterOptions.Favorites,

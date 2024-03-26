@@ -7,6 +7,7 @@ import 'package:shop_app/controllers/controllers.dart';
 import 'package:shop_app/models/stock_transfer.dart';
 import 'package:shop_app/providers/transfer.dart';
 import 'package:shop_app/screens/components/size_config.dart';
+import 'package:shop_app/screens/transfers/reject_transfer_screen.dart';
 import 'package:shop_app/services/notifier_service.dart';
 
 import '../models/order_item.dart' as ord;
@@ -113,10 +114,15 @@ class _TransferItemState extends State<TransferItem> {
                                     ),
                                     child:
                                         const Text('REJECT INCOMING TRANSER'),
-                                    onPressed: () => Navigator.pushNamed(
-                                        context,
-                                        RoutingConstants.transferRejection,
-                                        arguments: widget.transfer),
+                                    onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            TransferRejectionScreen(
+                                          transfer: widget.transfer,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),

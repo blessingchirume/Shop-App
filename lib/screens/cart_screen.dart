@@ -1,30 +1,27 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
+import 'dart:typed_data';
 
+import 'package:davinci/core/davinci_capture.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/controllers/controllers.dart';
+import 'package:shop_app/models/currency_model.dart';
 import 'package:shop_app/models/persisted_transaction_model.dart';
+import 'package:shop_app/providers/currency.dart';
 import 'package:shop_app/providers/draft_order.dart';
 import 'package:shop_app/providers/user.dart';
 import 'package:shop_app/screens/components/colors.dart';
-import 'package:shop_app/screens/components/dropdown_button.dart';
 import 'package:shop_app/screens/components/size_config.dart';
-import 'package:shop_app/screens/login_page/widgets/text_field_widget/text_field_input.dart';
 import 'package:shop_app/screens/login_page/widgets/text_field_widget/text_field_input_with_callback.dart';
-import 'package:shop_app/screens/success_page/success_page_view.dart';
+import 'package:shop_app/screens/print_widget.dart';
 import 'package:shop_app/screens/success_page/widgets/lottie_widget.dart';
 import 'package:shop_app/services/file_conversion_service.dart';
-import 'package:shop_app/services/notifier_service.dart';
 import 'package:shop_app/widgets/buttons/spinner_button.dart';
 
 import '../providers/cart.dart';
 import '../widgets/cart_item.dart';
-import '../providers/orders.dart';
-import 'dart:ui' as ui;
 import '../models/cart_item.dart' as cartItem;
 
 class CartScreen extends StatefulWidget {
@@ -49,6 +46,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<Cart>(context, listen: false);
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(title: Text('Customer Cart')),
@@ -88,8 +86,13 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                           context: context,
                           builder: (BuildContext context) {
-                            List<String> list = ['USD', 'ECO'];
-                            String selectedCurrency = list.first;
+                            List<CurrencyModel> list =
+                                Provider.of<Currency>(context, listen: false)
+                                    .currencies;
+                            var currencyProvider =
+                                Provider.of<Currency>(context, listen: false);
+
+                            CurrencyModel selectedCurrency = list.first;
                             return Padding(
                               padding: EdgeInsets.only(
                                   bottom:
@@ -103,67 +106,6 @@ class _CartScreenState extends State<CartScreen> {
                                           MainAxisAlignment.center,
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              SizeConfig.screenWidth! / 20.55,
-                                              SizeConfig.screenHeight! / 68.3,
-                                              SizeConfig.screenWidth! / 20.55,
-                                              SizeConfig.screenHeight! / 34.15),
-                                          child:
-                                              DropdownButtonFormField<String>(
-                                            onChanged: (value) {
-                                              selectedCurrency = value!;
-                                            },
-                                            value: selectedCurrency,
-                                            items: list
-                                                .map((e) => DropdownMenuItem(
-                                                      child: Text(e),
-                                                      value: e,
-                                                    ))
-                                                .toList(),
-                                            decoration: InputDecoration(
-                                                prefixIcon: Icon(
-                                                    Icons.payment_outlined),
-                                                focusedBorder:
-                                                    OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              20.0)),
-                                                  borderSide: BorderSide(
-                                                      width: SizeConfig
-                                                              .screenWidth! /
-                                                          205.5,
-                                                      color: textColor),
-
-                                                  /// 2
-                                                ),
-                                                enabledBorder:
-                                                    UnderlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10.0)),
-                                                  borderSide: BorderSide(
-                                                      width: 1,
-                                                      color: texthint),
-                                                ),
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20.0),
-                                                ),
-                                                hintText: "Select currency",
-                                                hintStyle: TextStyle(
-                                                    color: texthint
-                                                        .withOpacity(0.3)),
-                                                labelText: "Select currency",
-                                                labelStyle: TextStyle(
-                                                    color: texthint
-                                                        .withOpacity(0.6))),
-                                          ),
-                                        ),
-
                                         TextFieldInputWithCallBack(
                                           iconName:
                                               Icons.monetization_on_outlined,
@@ -178,8 +120,11 @@ class _CartScreenState extends State<CartScreen> {
                                           isLoading: isLoading,
                                           label: 'CONFIRM SALE',
                                           onPressed: () async {
-                                            await _processTransaction(cart,
-                                                selectedCurrency, context);
+                                            await _processTransaction(
+                                                cart,
+                                                currencyProvider
+                                                    .selectedCurrency.code!,
+                                                context);
                                             Navigator.pop(context);
                                           },
                                         ),
@@ -246,6 +191,20 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> _processTransaction(
       Cart cart, String selectedCurrency, BuildContext context) async {
+    var provider = Provider.of<UserProvider>(context, listen: false);
+
+    var image = await DavinciCapture.offStage(
+        PreviewWidget(
+          cart: cart,
+          invoiceNumber: 90902393,
+          user: provider.user.user,
+          tenderedAmount:
+              double.parse(tenderedAmountTextEditingController.text),
+        ),
+        returnImageUint8List: true,
+        openFilePreview: false,
+        pixelRatio: MediaQuery.of(context).devicePixelRatio);
+
     if (tenderedAmountTextEditingController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -257,7 +216,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ),
       );
-      _generatePrintableInvoice(context, cart.items.values.toList());
+
       return;
     }
 
@@ -281,7 +240,11 @@ class _CartScreenState extends State<CartScreen> {
       });
 
       if (orderplaced) {
-        _generatePrintableInvoice(context, cart.items.values.toList());
+        // var image = await DavinciCapture.offStage(PreviewWidget(cart: cart, invoiceNumber: 7890127, user: ,),
+        //     returnImageUint8List: true,
+        //     openFilePreview: false,
+        //     pixelRatio: MediaQuery.of(context).devicePixelRatio);
+        _generatePrintableInvoice(context, image);
         cart.clear();
         setState(() {
           isLoading = false;
@@ -315,6 +278,8 @@ class _CartScreenState extends State<CartScreen> {
             ),
           ),
         );
+        _generatePrintableInvoice(context, image);
+        cart.clear();
       }
     } on SocketException catch (e) {
       List<Item> draftItems = [];
@@ -345,6 +310,8 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ),
       );
+      _generatePrintableInvoice(context, image);
+      cart.clear();
     }
   }
 
@@ -439,11 +406,11 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future _generatePrintableInvoice(
-      BuildContext context, List<cartItem.CartItem> items) async {
+      BuildContext context, Uint8List image) async {
     // String data = await _serializeTransactionPayload(context, items);
     var data = await FileConversionService().readCounter();
     final String response =
-        await CartScreen.platform.invokeMethod('doPrint', data);
+        await CartScreen.platform.invokeMethod('doPrint', image);
   }
 
   Future<String> _serializeTransactionPayload(
@@ -474,8 +441,7 @@ class _CartScreenState extends State<CartScreen> {
       },
       "items": test
     });
-    // final String response = await rootBundle.loadString('assets/data/en.json');
-    // final data = await json.decode(response);
+
     return xxx;
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:shop_app/constants/routing_constants.dart';
+import 'package:shop_app/providers/currency.dart';
 import 'package:shop_app/providers/draft_order.dart';
 import 'package:shop_app/providers/transfer.dart';
 import 'package:shop_app/providers/user.dart';
@@ -25,7 +26,7 @@ void callbackDispatcher() {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
   runApp(MyApp());
 }
 
@@ -56,6 +57,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => TransferProvider()),
         ChangeNotifierProvider(create: (context) => OfflineOrderProvider()),
+        ChangeNotifierProvider(create: (context) => Currency()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -64,7 +66,7 @@ class _MyAppState extends State<MyApp> {
           colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green)
               .copyWith(secondary: Colors.deepOrange),
         ),
-        initialRoute: RoutingConstants.davinci,
+        initialRoute: RoutingConstants.login,
         onGenerateRoute: RouteGenerator.generateRoute,
         // routes: {
         //   '/': (context) => ProductsOverViewScreen(),
